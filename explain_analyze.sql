@@ -1,0 +1,1 @@
+-- TODO: use explain / analyze, create an index
