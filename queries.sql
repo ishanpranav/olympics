@@ -46,7 +46,8 @@ select
             when athlete_event.noc = 'UNK' then 'Unknown'
             else athlete_event.team
         end
-    ) as region
+    ) as region,
+    athlete_event.sport
 from athlete_event
 left join noc_region on athlete_event.noc = noc_region.noc
 ;
@@ -56,10 +57,24 @@ left join noc_region on athlete_event.noc = noc_region.noc
 --     for each fencing 🤺 event based  on the number of total gold medals 🥇
 --     that region had for that fencing event.
 
-select
-    region,
-    "event"
-from athlete_event
-left join noc_region on athlete_event.noc = noc_region.noc
-where athlete_event.sport = 'Fencing' and athlete_event.medal = 'Gold'
+with
+    counts as (
+        select 
+            "event",
+            region,
+            count(*) as golds
+        from friendly_region
+        where sport = 'Fencing' and medal = 'Gold'
+        group by "event", region
+    ),
+    ranking as (
+        select
+            "event",
+            region,
+            golds,
+            rank() over (partition by "event" order by golds desc) as rank
+        from counts
+    )
+select region, "event", golds, rank
+from ranking
 ;
