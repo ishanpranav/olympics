@@ -25,6 +25,41 @@ select
     athlete_event."event",
     athlete_event.medal
 from athlete_event
-join noc_region on athlete_event.noc = noc_region.noc
+left join noc_region on athlete_event.noc = noc_region.noc
 where athlete_event.medal is not null
+;
+
+--    This view joins the two tables and supplies a friendly region name.
+
+create or replace view friendly_region as
+select
+    athlete_event."event",
+    athlete_event.team,
+    athlete_event.noc,
+    athlete_event.medal,
+    coalesce(
+        noc_region.region,
+        case
+            when athlete_event.noc = 'SGP' then 'Singapore'
+            when athlete_event.noc = 'ROT' then 'Refugee'
+            when athlete_event.noc = 'TUV' then 'Tuvalu'
+            when athlete_event.noc = 'UNK' then 'Unknown'
+            else athlete_event.team
+        end
+    ) as region
+from athlete_event
+left join noc_region on athlete_event.noc = noc_region.noc
+;
+
+-- 2. Use the window function `rank()`
+--     This query show the top 3 ranked regions
+--     for each fencing 🤺 event based  on the number of total gold medals 🥇
+--     that region had for that fencing event.
+
+select
+    region,
+    "event"
+from athlete_event
+left join noc_region on athlete_event.noc = noc_region.noc
+where athlete_event.sport = 'Fencing' and athlete_event.medal = 'Gold'
 ;
