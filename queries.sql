@@ -47,7 +47,8 @@ select
             else athlete_event.team
         end
     ) as region,
-    athlete_event.sport
+    athlete_event.sport,
+    athlete_event.year
 from athlete_event
 left join noc_region on athlete_event.noc = noc_region.noc
 ;
@@ -79,4 +80,27 @@ select region, "event", golds, rank
 from ranking
 where rank <= 3
 order by "event", rank
+;
+
+-- 3. Using aggregate functions as window functions
+--     Shows the rolling sum of medals per region, per year, and per medal type.
+
+with counts as (
+    select
+        region,
+        "year",
+        medal,
+        count(*) as c
+    from friendly_region
+    where medal is not null
+    group by region, "year", medal
+)
+select 
+    region,
+    "year",
+    medal,
+    c,
+    sum(c) over (partition by region, medal order by "year") as "sum"
+from counts
+order by region, "year", medal
 ;
