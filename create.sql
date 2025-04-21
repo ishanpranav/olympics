@@ -1,3 +1,6 @@
+-- create.sql
+-- Licensed under the MIT license.
+
 DROP TABLE IF EXISTS athlete_event CASCADE;
 DROP TABLE IF EXISTS noc_region;
 
@@ -26,8 +29,12 @@ CREATE TABLE athlete_event (
 	medal text
 );
 
--- TODO: run the sql above and import data
+copy noc_region
+from "data/noc_regions.csv"
+with csv null as 'NA' header
+;
 
--- example import using client side \copy (note relative paths)
--- \copy noc_region from noc_regions.csv with csv null as 'NA' header
--- \copy athlete_event (id, name, sex, age, height, weight, team, noc, games, year, season, city, sport, event, medal) from athlete_events.csv with csv null as 'NA' header
+copy athlete_event (id, name, sex, age, height, weight, team, noc, games, year, season, city, sport, event, medal)
+from "data/athlete_events.csv"
+with csv null as 'NA' header
+;
