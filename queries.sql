@@ -77,4 +77,5 @@ with
     )
 select region, "event", golds, rank
 from ranking
+where rank <= 3
 ;
