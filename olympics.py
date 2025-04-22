@@ -13,11 +13,15 @@ class AthleteEvent(Base):
     __tablename__ = 'athlete_event'
     athlete_event_id: Mapped[int] = mapped_column(primary_key = True)
     name: Mapped[str] = mapped_column()
-    noc: Mapped[str] = mapped_column(ForeignKey('noc_region.noc'))
-    season: Mapped[str] = mapped_column()
+    team: Mapped[str] = mapped_column()
+    medal: Mapped[str] = mapped_column()
     year: Mapped[int] = mapped_column()
+    season: Mapped[str] = mapped_column()
+    city: Mapped[str] = mapped_column()
+    sport: Mapped[str] = mapped_column()
     event: Mapped[str] = mapped_column()
     medal: Mapped[str] = mapped_column()
+    noc: Mapped[str] = mapped_column(ForeignKey('noc_region.noc'))
     noc_region = relationship("NOCRegion", back_populates="athlete_events")
     
     def __str__(self):
@@ -49,9 +53,16 @@ Session = sessionmaker(engine)
 session = Session()
 
 athleteEvent = AthleteEvent()
-athleteEvent.name = "Yurr"
+athleteEvent.name = "Yuto Horigome"
+athleteEvent.team = "Japan"
+athleteEvent.medal = "Gold"
+athleteEvent.year = 2020
+athleteEvent.season = "Summer"
+athleteEvent.city = "Tokyo"
+athleteEvent.noc = 'JPN'
+athleteEvent.sport = "Skateboarding"
+athleteEvent.event = "Skatboarding, Street, Men"
 
 session.add(athleteEvent)
 session.commit()
-
 session.close()
