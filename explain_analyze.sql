@@ -5,4 +5,8 @@
 
 drop index if exists athlete_event_name_idx;
 
--- 2. 
+-- 2. Write a simple query:
+
+select * from athlete_event
+where "name" ilike '%Michael Fred Phelps, II%'
+;
