@@ -1,34 +1,57 @@
+# olympics.py
+# Licensed with the MIT license.
+
 import configparser
 from operator import itemgetter
+from sqlalchemy import ForeignKey, create_engine
+from sqlalchemy.orm import DeclarativeBase, Mapped, declarative_base, mapped_column, relationship, sessionmaker
 
-import sqlalchemy
-from sqlalchemy import create_engine
+class Base(DeclarativeBase):
+    pass
 
-# columns and their types, including fk relationships
-from sqlalchemy import Column, Integer, Float, String, DateTime
-from sqlalchemy import ForeignKey
-from sqlalchemy.orm import relationship
+class AthleteEvent(Base):
+    __tablename__ = 'athlete_event'
+    athlete_event_id: Mapped[int] = mapped_column(primary_key = True)
+    name: Mapped[str] = mapped_column()
+    noc: Mapped[str] = mapped_column(ForeignKey('noc_region.noc'))
+    season: Mapped[str] = mapped_column()
+    year: Mapped[int] = mapped_column()
+    event: Mapped[str] = mapped_column()
+    medal: Mapped[str] = mapped_column()
+    noc_region = relationship("NOCRegion", back_populates="athlete_events")
+    
+    def __str__(self):
+        return f"{self.name} {self.noc} {self.season} {self.year} {self.event} {self.medal}"
+    
+    def __repr__(self):
+        return f"{self.name} {self.noc} {self.season} {self.year} {self.event} {self.medal}"
+    
+class NOCRegion(Base):
+    __tablename__ = 'noc_region'
+    noc: Mapped[str] = mapped_column(primary_key = True)
+    region: Mapped[str]
+    athlete_events = relationship("AthleteEvent", back_populates="noc_region")
 
-# declarative base, session, and datetime
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-from datetime import datetime
+# Configuring your database connection
 
-# configuring your database connection
 config = configparser.ConfigParser()
 config.read('config.ini')
 u, pw, host, db = itemgetter('username', 'password', 'host', 'database')(config['db'])
 dsn = f'postgresql://{u}:{pw}@{host}/{db}'
+
 print(f'using dsn: {dsn}')
 
 # SQLAlchemy engine, base class and session setup
+
 engine = create_engine(dsn, echo=True)
 Base = declarative_base()
 Session = sessionmaker(engine)
 session = Session()
 
-# TODO: Write classes and code here
+athleteEvent = AthleteEvent()
+athleteEvent.name = "Yurr"
 
+session.add(athleteEvent)
+session.commit()
 
 session.close()
-
