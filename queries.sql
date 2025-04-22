@@ -104,3 +104,18 @@ select
 from counts
 order by region, "year", medal
 ;
+
+-- 4. Use the window function, `lag()`
+--     Shows the height of every gold medalist for pole valut events, along with
+--     the height of the gold medalist for that same pole value event in the
+--     previous year.
+
+select
+    "event",
+    "year",
+    height,
+    lag(height) over (partition by "event" order by "year") as previous_height
+from athlete_event
+where "event" ilike '%Pole Vault%' and medal = 'Gold'
+order by "event", "year"
+;
