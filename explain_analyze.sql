@@ -44,3 +44,20 @@ where "name" = 'Michael Fred Phelps, II'
 --  Planning Time: 1.375 ms
 --  Execution Time: 0.330 ms
 -- (4 rows)
+
+-- 6. Ignoring an index:
+
+explain analyze
+select * from athlete_event
+where "name" ilike '%Michael%'
+;
+
+--  Gather  (cost=1000.00..8215.76 rows=27 width=137) (actual time=0.955..76.235 rows=2079 loops=1)
+--    Workers Planned: 2
+--    Workers Launched: 2
+--    ->  Parallel Seq Scan on athlete_event  (cost=0.00..7213.06 rows=11 width=137) (actual time=0.384..65.479 rows=693 loops=3)
+--          Filter: (name ~~* '%Michael%'::text)
+--          Rows Removed by Filter: 89679
+--  Planning Time: 0.190 ms
+--  Execution Time: 76.343 ms
+-- (8 rows)
