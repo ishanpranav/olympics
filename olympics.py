@@ -3,7 +3,7 @@
 
 import configparser
 from operator import itemgetter
-from sqlalchemy import ForeignKey, create_engine
+from sqlalchemy import ForeignKey, create_engine, select
 from sqlalchemy.orm import DeclarativeBase, Mapped, declarative_base, mapped_column, relationship, sessionmaker
 
 class Base(DeclarativeBase):
@@ -65,4 +65,15 @@ athleteEvent.event = "Skatboarding, Street, Men"
 
 session.add(athleteEvent)
 session.commit()
+
+query = select(AthleteEvent).where(
+    AthleteEvent.noc == 'JPN',
+    AthleteEvent.year >= 2016,
+    AthleteEvent.medal == 'Gold'
+)
+results = session.scalars(query).all()
+
+for result in results:
+    print(f"{result.name}\t{result.noc_region.region}\t{result.event}\t{result.year}\t{result.season}")
+
 session.close()
